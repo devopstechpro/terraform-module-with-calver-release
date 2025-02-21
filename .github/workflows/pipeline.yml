@@ -23,11 +23,12 @@ jobs:
         with:
           fetch-depth: 1
           fetch-tags: true
-          persist-credentials: false
 
       - name: CalVer
         id: calver
         uses: energostack/calver-action@v1
+        with:
+          prerelease: ${{ github.event_name == 'workflow_dispatch' }}
 
       - uses: thejeff77/action-push-tag@v1.0.0
         with:
