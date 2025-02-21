@@ -4,6 +4,8 @@ This repository contains reusable Terraform modules designed for managing bucket
 
 ## Step-by-setup semantic versioning on a repo:
 
+The calver actions needs/depends on multiple github actions to create and push a version/release. Specifically push-tag and create-release actions from marketplace.
+
 1. Create `.github/workflows/pipeline.yml` file
    ```
    name: Release
@@ -31,16 +33,19 @@ This repository contains reusable Terraform modules designed for managing bucket
            with:
              fetch-depth: 1
              fetch-tags: true
-             persist-credentials: false
 
          - name: CalVer
            id: calver
            uses: energostack/calver-action@v1
+           with:
+             prerelease: ${{ github.event_name == 'workflow_dispatch' }}
 
-         - uses: thejeff77/action-push-tag@v1
+         - uses: thejeff77/action-push-tag@v1.0.0
            with:
              tag: ${{ steps.calver.outputs.next_version }}
              message: '"${{ steps.calver.outputs.next_version }}: PR #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}"'
+           env:
+             GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
          - name: Create Release
            uses: softprops/action-gh-release@v1
@@ -48,8 +53,15 @@ This repository contains reusable Terraform modules designed for managing bucket
              tag_name: ${{ steps.calver.outputs.next_version }}
              generate_release_notes: true
              prerelease: ${{ github.event_name == 'workflow_dispatch' }}
+           env:
+               GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
    ```
+2. You will need a [Github Personal Access Token](https://github.com/settings/personal-access-tokens/new) and store it as environment variable via `Settings > CI/CD > Actions variables > Secret`
+
+3. Make and pull request and merge to Main or Master branch this will automatically publish a semantic release version tag for the commit.
 
 ## References
 
 1. [calver-action on Github marketplace](https://github.com/marketplace/actions/next-calver)
+2. [push-tag action on Github marketplace](https://github.com/marketplace/actions/push-any-git-tag)
+3. [create-release action on Github marketplace](https://github.com/marketplace/actions/gh-release)
