@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 permissions:
   contents: write # for checkout
@@ -27,8 +26,6 @@ jobs:
       - name: CalVer
         id: calver
         uses: energostack/calver-action@v1
-        with:
-          prerelease: ${{ github.event_name == 'workflow_dispatch' }}
 
       - uses: thejeff77/action-push-tag@v1.0.0
         with:
@@ -42,6 +39,5 @@ jobs:
         with:
           tag_name: ${{ steps.calver.outputs.next_version }}
           generate_release_notes: true
-          prerelease: ${{ github.event_name == 'workflow_dispatch' }}
         env:
             GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
