@@ -34,6 +34,8 @@ jobs:
         with:
           tag: ${{ steps.calver.outputs.next_version }}
           message: '"${{ steps.calver.outputs.next_version }}: PR #${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}"'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -41,3 +43,5 @@ jobs:
           tag_name: ${{ steps.calver.outputs.next_version }}
           generate_release_notes: true
           prerelease: ${{ github.event_name == 'workflow_dispatch' }}
+        env:
+            GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
