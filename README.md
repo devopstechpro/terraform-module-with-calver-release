@@ -65,3 +65,42 @@ The calver actions needs/depends on multiple github actions to create and push a
 1. [calver-action on Github marketplace](https://github.com/marketplace/actions/next-calver)
 2. [push-tag action on Github marketplace](https://github.com/marketplace/actions/push-any-git-tag)
 3. [create-release action on Github marketplace](https://github.com/marketplace/actions/gh-release)
+
+
+## Approach 2
+
+1. Create `.github/workflows/pipeline.yml` file
+  ```
+   name: Release
+   on:
+     push:
+       branches:
+         - main
+     workflow_dispatch:
+
+   concurrency:
+     publish_version
+
+
+   jobs:
+     publish:
+       runs-on: ubuntu-latest
+       timeout-minutes: 30
+       steps:
+         - uses: actions/checkout@v3
+         - uses: cho0o0/calver-release-action@2022.12.14.1
+           with:
+             generate_release_notes: true
+             dry_run: false
+             # Do not use GITHUB_TOKEN if you want to trigger other workflows
+             timezone: 'utc'
+             api_token: ${{secrets.GH_TOKEN}}
+             release_title: '${version}'
+  ```
+2. You will need a [Github Personal Access Token](https://github.com/settings/personal-access-tokens/new) and store it as environment variable via `Settings > CI/CD > Actions variables > Secret`
+
+3. Make and pull request and merge to Main or Master branch this will automatically publish a semantic release version tag for the commit.
+
+Ref:
+
+1. [calver-release-action Github marketplace](https://github.com/marketplace/actions/next-calver)
