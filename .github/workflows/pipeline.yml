@@ -1,9 +1,14 @@
-name: Publish
-
+name: Release
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
+
 concurrency:
   publish_version
+
+
 jobs:
   publish:
     runs-on: ubuntu-latest
